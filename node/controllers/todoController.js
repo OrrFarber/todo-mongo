@@ -23,24 +23,14 @@ exports.delete = (req, res) => {
     })
     .catch((err) => console.log(err));
 };
-exports.edit = (req, res) => {
-  Todo.findByIdAndUpdate(req.body.id, req.body.fields)
-    .then((todo) => {
-      if (!todo) {
-        res.status(500).json({ message: "todo doesn't exist" });
-      } else {
-        res.status(200).json({ message: "todo updated" });
-      }
-    })
-    .catch((err) => console.log(err));
-};
 
 exports.list = (req, res) => {
   Todo.find()
     .then((list) => {
       if (!list) {
-        res.status(201).json({ message: "no list" });
+        res.status(500).json({ message: "no list" });
       } else {
+        console.log(list);
         res.status(200).json({ message: "list found", list: list });
       }
     })
@@ -53,20 +43,41 @@ exports.mark = (req, res) => {};
 exports.edit = (req, res) => {
   const { _id, title, description, date, complete } = req.body;
   try {
-    todo
-      .updateOne(
-        {
-          _id,
-        },
-        {
-          title,
-          description,
-          complete,
-        }
-      )
-      .then((rs) => {});
-  } catch {}
+    Todo.updateOne(
+      {
+        _id,
+      },
+      {
+        title,
+        description,
+        date,
+        complete,
+      }
+    ).then((res) => {
+      if (res.modifiCount > 0) {
+        res.status(200).json({ res });
+      } else {
+        res.status(500).json({ message: "todo updated" });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
+
+// exports.edit = (req, res) => {
+//   Todo.findByIdAndUpdate(req.body.id, req.body.fields)
+//     .then((todo) => {
+//       if (!todo) {
+//         res.status(500).json({ message: "todo doesn't exist" });
+//       } else {
+//         res.status(200).json({ message: "todo updated" });
+//       }
+//     })
+//     .catch((err) => {
+//       res.status(500).json({ message: err });
+//     });
+// };
 
 //   Todo.findOne(
 //     {
